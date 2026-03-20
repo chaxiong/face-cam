@@ -1,15 +1,60 @@
 version: '3.8'
 
 services:
+
+  # ── MySQL database ──────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: faceid-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── phpMyAdmin ──────────────────────────────────────
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: faceid-pma
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8080:80"
+
+  # ── Face Recognition app ────────────────────────────
   face-recognition:
     build: .
-    ports:
-      - "8000:8000"
+    container_name: faceid-app
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     volumes:
       - ./data:/app/data
-    environment:
-      - DB_HOST=192.168.200.91
-      - DB_USER=root
-      - DB_PASSWORD=rootpassword
-      - DB_NAME=face_recognition_db
-    restart: always
+    ports:
+      - "8000:8000"
+
+volumes:
+  db_data:

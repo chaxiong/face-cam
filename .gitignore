@@ -1,0 +1,15 @@
+# Environment variables (never commit secrets)
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Data / models
+data/
+
+# OS
+.DS_Store
+Thumbs.db
