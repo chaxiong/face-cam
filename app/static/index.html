@@ -3,49 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FaceID Pro - Advanced AI Recognition</title>
+    <title>FaceID Pro — AI Recognition System</title>
+    <meta name="description" content="Advanced AI-powered facial recognition system for secure identity verification and training.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/index.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="glass-container">
-        <header>
-            <h1>FaceID <span>Pro</span></h1>
-            <p>Smart Facial Recognition System</p>
+
+<!-- Toast container -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- App shell -->
+<div class="app-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                    <path d="M7 20.662V19c0-1.105.895-2 2-2h6c1.105 0 2 .895 2 2v1.662"/>
+                </svg>
+            </div>
+            <div class="logo-text">
+                <span class="logo-title">FaceID</span>
+                <span class="logo-sub">Pro</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button id="navTrain" class="nav-item active" data-tab="train">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                <span>Enroll Face</span>
+            </button>
+            <button id="navTest" class="nav-item" data-tab="test">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+                <span>Recognize</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-status">
+            <div class="status-dot" id="camDot"></div>
+            <span id="sidebarStatus">Initializing…</span>
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+
+        <!-- Top bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1 id="pageTitle">Enroll New Face</h1>
+                <p id="pageDesc">Position your face inside the frame and capture</p>
+            </div>
+            <div class="topbar-right">
+                <div class="system-badge">
+                    <span class="pulse-dot"></span>
+                    System Online
+                </div>
+            </div>
         </header>
 
-        <main>
-            <div class="camera-section">
-                <div class="video-wrapper">
-                    <video id="video" autoplay muted></video>
+        <!-- Content grid -->
+        <div class="content-grid">
+
+            <!-- Camera panel -->
+            <section class="camera-panel">
+                <div class="video-frame" id="videoFrame">
+                    <video id="video" autoplay muted playsinline></video>
                     <canvas id="canvas" style="display:none;"></canvas>
-                    <div class="scan-line"></div>
-                </div>
-                <div class="status-badge" id="status">Ready</div>
-            </div>
 
-            <div class="controls-section">
-                <div class="tab-buttons">
-                    <button id="trainTab" class="active">Train</button>
-                    <button id="testTab">Test</button>
+                    <!-- Corner bracket overlay -->
+                    <div class="brackets">
+                        <span class="br tl"></span>
+                        <span class="br tr"></span>
+                        <span class="br bl"></span>
+                        <span class="br br-corner"></span>
+                    </div>
+
+                    <!-- Scan line -->
+                    <div class="scan-line" id="scanLine"></div>
+
+                    <!-- Face target ring -->
+                    <div class="face-ring" id="faceRing"></div>
+
+                    <!-- Camera label -->
+                    <div class="cam-label">
+                        <span class="rec-dot"></span>
+                        LIVE
+                    </div>
                 </div>
 
-                <div id="trainControls" class="control-group">
-                    <input type="text" id="nameInput" placeholder="Enter your name">
-                    <button id="trainBtn" class="primary-btn">Capture & Train</button>
+                <!-- Confidence bar (test mode) -->
+                <div class="confidence-strip" id="confidenceStrip" style="display:none;">
+                    <span class="conf-label">Match Confidence</span>
+                    <div class="conf-bar-wrap">
+                        <div class="conf-bar" id="confBar"></div>
+                    </div>
+                    <span class="conf-pct" id="confPct">—</span>
+                </div>
+            </section>
+
+            <!-- Control panel -->
+            <section class="control-panel">
+
+                <!-- TRAIN panel -->
+                <div id="trainPanel" class="panel-body">
+                    <div class="panel-section">
+                        <label class="field-label" for="nameInput">Full Name</label>
+                        <input type="text" id="nameInput" class="field-input" placeholder="e.g. John Smith" autocomplete="off">
+                    </div>
+
+                    <div class="capture-preview-row" id="captureRow">
+                        <div class="capture-thumb empty" id="thumb1"><span>1</span></div>
+                        <div class="capture-thumb empty" id="thumb2"><span>2</span></div>
+                        <div class="capture-thumb empty" id="thumb3"><span>3</span></div>
+                    </div>
+                    <p class="hint-text">Capture 3 photos from different angles for best accuracy</p>
+
+                    <div class="btn-group">
+                        <button id="captureBtn" class="btn btn-secondary">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                            Capture Photo
+                        </button>
+                        <button id="trainBtn" class="btn btn-primary" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Save & Enroll
+                        </button>
+                    </div>
+
+                    <button id="resetBtn" class="btn btn-ghost">Clear captures</button>
                 </div>
 
-                <div id="testControls" class="control-group hidden">
-                    <button id="testBtn" class="primary-btn secondary">Start Auto Recognition</button>
-                    <div id="result" class="result-text"></div>
-                </div>
-            </div>
-        </main>
+                <!-- TEST panel -->
+                <div id="testPanel" class="panel-body" style="display:none;">
+                    <div class="result-card" id="resultCard">
+                        <div class="result-avatar" id="resultAvatar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                            </svg>
+                        </div>
+                        <div class="result-info">
+                            <p class="result-label">Detected Identity</p>
+                            <p class="result-name" id="resultName">—</p>
+                        </div>
+                        <div class="result-status-icon" id="resultIcon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                        </div>
+                    </div>
 
-        <footer>
-            <p>Powered by Advanced Vision AI</p>
-        </footer>
-    </div>
-    <script src="/static/app.js"></script>
+                    <div class="btn-group" style="margin-top:auto;">
+                        <button id="testBtn" class="btn btn-primary">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            Start Recognition
+                        </button>
+                    </div>
+
+                    <div class="scan-info" id="scanInfo" style="display:none;">
+                        <span class="mono">Scanning every 2s</span>
+                        <span class="scan-ticker" id="scanTicker">●</span>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+    </main>
+</div>
+
+<script src="/static/app.js"></script>
 </body>
 </html>
