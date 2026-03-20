@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceID Pro - Advanced AI Recognition</title>
+    <link rel="stylesheet" href="/static/index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="glass-container">
+        <header>
+            <h1>FaceID <span>Pro</span></h1>
+            <p>Smart Facial Recognition System</p>
+        </header>
+
+        <main>
+            <div class="camera-section">
+                <div class="video-wrapper">
+                    <video id="video" autoplay muted></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <div class="scan-line"></div>
+                </div>
+                <div class="status-badge" id="status">Ready</div>
+            </div>
+
+            <div class="controls-section">
+                <div class="tab-buttons">
+                    <button id="trainTab" class="active">Train</button>
+                    <button id="testTab">Test</button>
+                </div>
+
+                <div id="trainControls" class="control-group">
+                    <input type="text" id="nameInput" placeholder="Enter your name">
+                    <button id="trainBtn" class="primary-btn">Capture & Train</button>
+                </div>
+
+                <div id="testControls" class="control-group hidden">
+                    <button id="testBtn" class="primary-btn secondary">Start Auto Recognition</button>
+                    <div id="result" class="result-text"></div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Powered by Advanced Vision AI</p>
+        </footer>
+    </div>
+    <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  face-recognition:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DB_HOST=192.168.200.91
+      - DB_USER=root
+      - DB_PASSWORD=rootpassword
+      - DB_NAME=face_recognition_db
+    restart: always
